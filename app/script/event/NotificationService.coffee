@@ -65,7 +65,7 @@ class z.event.NotificationService
   ###
   get_last_notification_id_from_db: =>
     return new Promise (resolve, reject) =>
-      @storage_service.load @storage_service.OBJECT_STORE_AMPLIFY, @PRIMARY_KEY_LAST_NOTIFICATION
+      @storage_service.load z.storage.StorageService.OBJECT_STORE.AMPLIFY, @PRIMARY_KEY_LAST_NOTIFICATION
       .then (record) ->
         if record?.value
           resolve record.value
@@ -82,4 +82,4 @@ class z.event.NotificationService
   ###
   save_last_notification_id_to_db: (notification_id) =>
     payload = value: notification_id
-    return @storage_service.save @storage_service.OBJECT_STORE_AMPLIFY, @PRIMARY_KEY_LAST_NOTIFICATION, payload
+    return @storage_service.save z.storage.StorageService.OBJECT_STORE.AMPLIFY, @PRIMARY_KEY_LAST_NOTIFICATION, payload

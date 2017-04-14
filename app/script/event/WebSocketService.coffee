@@ -41,7 +41,7 @@ class z.event.WebSocketService
 
   ###
   Construct a new WebSocket Service.
-  @param client [z.service.Client] Client for the API calls
+  @param client [z.service.BackendClient] Client for the API calls
   ###
   constructor: (@client) ->
     @logger = new z.util.Logger 'z.event.WebSocketService', z.config.LOGGER.OPTIONS

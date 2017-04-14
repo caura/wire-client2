@@ -23,7 +23,7 @@ z.search ?= {}
 class z.search.SearchService
   ###
   Construct a new Search Service.
-  @param client [z.service.Client] Client for the API calls
+  @param client [z.service.BackendClient] Client for the API calls
   ###
   constructor: (@client) ->
     @logger = new z.util.Logger 'z.search.SearchService', z.config.LOGGER.OPTIONS

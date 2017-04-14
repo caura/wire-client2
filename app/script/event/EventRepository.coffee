@@ -187,7 +187,7 @@ class z.event.EventRepository
         if error_response.notifications
           amplify.publish z.event.WebApp.CONVERSATION.MISSED_EVENTS
           _got_notifications error_response
-        else if error_response.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
+        else if error_response.code is z.service.BackendClientError.STATUS_CODE.NOT_FOUND
           @logger.info "No notifications found since '#{notification_id}'", error_response
           reject new z.event.EventError z.event.EventError::TYPE.NO_NOTIFICATIONS
         else

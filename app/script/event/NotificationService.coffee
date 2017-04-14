@@ -26,7 +26,7 @@ class z.event.NotificationService
   URL_NOTIFICATIONS_LAST: '/notifications/last'
   ###
   Construct a new Notification Service.
-  @param client [z.service.Client] Client for the API calls
+  @param client [z.service.BackendClient] Client for the API calls
   ###
   constructor: (@client, @storage_service) ->
     @logger = new z.util.Logger 'z.event.NotificationService', z.config.LOGGER.OPTIONS

@@ -25,7 +25,7 @@ class z.properties.PropertiesService
 
   ###
   Construct a new Properties Service.
-  @param client [z.service.Client] Client for the API calls
+  @param client [z.service.BackendClient] Client for the API calls
   ###
   constructor: (@client) ->
     @logger = new z.util.Logger 'z.properties.PropertiesService', z.config.LOGGER.OPTIONS

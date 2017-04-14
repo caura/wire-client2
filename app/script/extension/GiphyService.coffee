@@ -23,7 +23,7 @@ z.extension ?= {}
 class z.extension.GiphyService
   ###
   Construct a new Giphy Service.
-  @param client [z.service.Client] Client for the API calls
+  @param client [z.service.BackendClient] Client for the API calls
   ###
   constructor: (@client) ->
     @GIPHY_ENDPOINT_BASE = '/giphy/v1/gifs'

@@ -25,6 +25,7 @@ LOCALYTICS =
   DISABLED_DOMAINS: [
     'localhost'
     'zinfra.io'
+    'caura.co'
   ]
 
 RAYGUN =
@@ -73,9 +74,10 @@ class z.tracking.EventTrackingRepository
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.SEND_DATA, @updated_send_data
 
   init_without_user_tracking: =>
-    @_enable_error_reporting()
+
 
     if not @_localytics_disabled()
+      @_enable_error_reporting()
       @_init_localytics() if not @localytics
       @set_custom_dimension z.tracking.CustomDimension.CONTACTS, -1
       amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, @tag_event
@@ -237,6 +239,7 @@ class z.tracking.EventTrackingRepository
       excludedHostnames: [
         'localhost'
         'wire.ms'
+        'caura.co'
       ]
       ignore3rdPartyErrors: true
 

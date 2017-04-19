@@ -21,6 +21,7 @@
 
 module.exports = (grunt) => {
   require('load-grunt-tasks')(grunt);
+  var env = grunt.option('env') || 'dev';
 
   const config = {
     aws: {
@@ -91,9 +92,12 @@ module.exports = (grunt) => {
 
   // Tasks
   grunt.loadTasks('grunt/tasks');
-  grunt.registerTask('default', ['prepare_dist', 'host']);
   grunt.registerTask('init', ['clean:ext', 'clean:temp', 'bower', 'scripts']);
-
+  if (env === 'prod'){
+    grunt.registerTask('default', ['prepare_dist']);
+  }else if(env === 'dev'){
+    grunt.registerTask('default', ['prepare_dist', 'host']);
+  }
   // Deploy to different environments
   grunt.registerTask('app_deploy', ['gitinfo', 'aws_deploy']);
   grunt.registerTask('app_deploy_staging', ['gitinfo', 'set_version:staging', 'aws_deploy']);

@@ -67,9 +67,13 @@ class z.ViewModel.AuthViewModel
     @event_repository = new z.event.EventRepository @web_socket_service, @notification_service, @cryptography_repository, @user_repository
 
     @pending_server_request = ko.observable false
+    # caura: all default attempts to authenticate come from guests
+    @guest_authentication =  ko.observable false
     @disabled_by_animation = ko.observable false
 
     @get_wire = ko.observable false
+    @loading = ko.observable true
+    @always_hidden = ko.observable true
     @session_expired = ko.observable false
     @device_reused = ko.observable false
 
@@ -287,8 +291,8 @@ class z.ViewModel.AuthViewModel
   # Sign in using a password login.
   login_password: =>
     return if @pending_server_request() or not @can_login_password() or not @_validate_input z.auth.AuthView.MODE.ACCOUNT_PASSWORD
-
     @pending_server_request true
+
     payload = @_create_payload z.auth.AuthView.MODE.ACCOUNT_PASSWORD
     @auth.repository.login payload, @persist()
     .then =>

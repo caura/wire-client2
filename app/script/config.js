@@ -130,4 +130,7 @@ window.z.config = {
 
   WEBSITE_PRODUCTION_URL: 'https://wire.com/',
   WEBSITE_STAGING_URL: 'https://staging-website.zinfra.io/',
+
+  CAURA_API_URL: z.util.Environment.frontend.is_localhost() ? 'http://localhost:5000' : 'https://api.caura.co/wire/',
+  CAURA_HEARTBEAT_FREQUENCY_MS: 5*1000
 };

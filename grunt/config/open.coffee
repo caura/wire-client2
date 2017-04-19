@@ -20,7 +20,7 @@
 
 module.exports =
   dist:
-    path: 'http://localhost:<%= config.server.port %>/auth/#login'
+    path: 'http://localhost:<%= config.server.port %>/'
   aws:
     path: 'http://localhost:<%= config.aws.port %>/'
   ebs:

@@ -324,6 +324,8 @@ class z.main.App
           if error.type in [z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN, z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE]
             @logger.error "Session expired on page reload: #{error.message}", error
             Raygun.send new Error ('Session expired on page reload'), error
+            # caura: approach #2 to authentication - cancel browser relogin
+            # authenticate quitely
             @_redirect_to_login true
           else
             @logger.warn 'Connectivity issues. Trigger reload on regained connectivity.', error
@@ -332,6 +334,8 @@ class z.main.App
           switch error.type
             when z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE, z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED, z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN
               @logger.warn "Redirecting to login: #{error.message}", error
+              # caura: approach #2 to authentication - cancel browser relogin
+              # authenticate quitely
               @_redirect_to_login false
             else
               @logger.error "Could not get access token: #{error.message}. Logging out user.", error
@@ -463,10 +467,18 @@ class z.main.App
   _redirect_to_login: (session_expired) ->
     @logger.info "Redirecting to login after connectivity verification. Session expired: #{session_expired}"
     @auth.client.execute_on_connectivity()
-    .then ->
-      url = "/auth/#{location.search}"
-      url = z.util.append_url_parameter url, z.auth.URLParameter.EXPIRED if session_expired
-      window.location.replace url
+    .then =>
+      @logger.info "caura: Attempting to login"
+      @auth.repository.login null, true
+      .then =>
+        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ACCOUNT.LOGGED_IN
+        # @_authentication_successful()
+        @init_app()
+
+    # .then ->
+    #   url = "/auth/#{location.search}"
+    #   url = z.util.append_url_parameter url, z.auth.URLParameter.EXPIRED if session_expired
+    #   window.location.replace url
 
 
   ###############################################################################

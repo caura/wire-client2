@@ -10,6 +10,8 @@
   </head>
 
   <body>
+    <div class="get-wire-info" data-bind="visible: always_hidden">
+
     <div class="auth-page">
       <div class="auth-header">
         <div class="wire-link" data-bind="click: clicked_on_wire_link" data-uie-name="go-home">
@@ -19,6 +21,7 @@
           </svg>
         </div>
       </div>
+      <!-- caura: disable login screen since we pre-authenticate users with guest priveleges -->
       <div class="content">
         <div class="get-wire-info" data-bind="visible: get_wire">
           <div data-bind="l10n_text: z.string.auth_account_get_wire" data-uie-name="status-get-wire"></div>
@@ -399,5 +402,9 @@
     #include('#dest/component.htm')
     #include('#dest/app.htm')
     #include('#dest/auth.htm')
+    </div>
+    <div class="content" data-bind="visible: loading">
+
+    </div>
   </body>
 </html>

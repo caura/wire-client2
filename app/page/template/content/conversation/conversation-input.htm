@@ -46,23 +46,7 @@
 
           <!-- ko if: input().length === 0 -->
 
-            <span id="conversation-input-ephemeral"
-                  class="controls-right-button conversation-input-ephemeral"
-                  data-bind="l10n_tooltip: z.string.tooltip_conversation_ephemeral"
-                  data-uie-name="do-set-ephemeral-timer">
-              <!-- ko if: has_ephemeral_timer() && conversation_et()-->
-                <div class="ephemeral-timer-button">
-                  <span class="ephemeral-timer-button-unit" data-bind="text: z.util.format_milliseconds_short(conversation_et().ephemeral_timer())[1]"></span>
-                  <span class="full-screen" data-bind="text: z.util.format_milliseconds_short(conversation_et().ephemeral_timer())[0]"></span>
-                </div>
-              <!-- /ko -->
-              <!-- ko ifnot: has_ephemeral_timer() -->
-                <span class="button-icon-large icon-hourglass"></span>
-              <!-- /ko -->
-                <context-menu class="controls-right-button-ephemeral-context"
-                              params="entries: get_context_menu_entries(), placement: 'top', tag: 'ephemeral'"
-                              tabindex="-1"></context-menu>
-            </span>
+          <!-- caura: wire conversation-input-ephemeral placeholder -->
 
             <label id="conversation-input-photo"
                    class="controls-right-button button-icon-large"

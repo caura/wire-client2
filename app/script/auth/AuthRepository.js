@@ -27,6 +27,14 @@ window.z.auth.AuthRepository = class AuthRepository {
     this.access_token_refresh = undefined;
     this.auth_service = auth_service;
     this.logger = new z.util.Logger('z.auth.AuthRepository', z.config.LOGGER.OPTIONS);
+//  caura: Encryption for Login
+    this.storage_service = new z.storage.StorageService();
+    this.storage_repository = new z.storage.StorageRepository(this.storage_service);
+    this.cryptography_service = new z.cryptography.CryptographyRepository(this.auth_service.client);
+    this.cryptography_repository = new z.cryptography.CryptographyRepository(this.cryptography_service, this.storage_repository);
+    this.client_service = new z.client.ClientService(this.auth_service.client, this.storage_service);
+    this.client_repository = new z.client.ClientRepository(this.client_service, this.cryptography_repository);
+// caura: Encryption for Login
     amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, this, this.renew_access_token);
   }
 
@@ -59,13 +67,34 @@ window.z.auth.AuthRepository = class AuthRepository {
    * @returns {Promise} Promise that resolves with the received access token
    */
   login(login, persist) {
-    return this.auth_service.post_login(login, persist)
+    // caura: sample submit information
+    // if (typeof login === "undefined" || login === null) {
+    login = {"password":"bVkdPLw6YBLTQbvBJDBTVigJ","email":"segahm@gmail.com"};
+    // login = {"label":"webapp@3645609118@permanent@1492569064462","label_key":"z.storage.StorageKey.AUTH.COOKIE_LABEL@3645609118@permanent","password":"bVkdPLw6YBLTQbvBJDBTVigJ","email":"segahm@gmail.com"};
+    persist = true;
+    var payload = this.create_payload(login.email,login.password);
+    // }
+    return this.auth_service.post_login(payload, persist)
       .then((response) => {
         this.save_access_token(response);
         z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, persist);
         z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
         return response;
       });
+  }
+
+  create_payload(username,password){
+    var payload = {
+      label: this.client_repository.construct_cookie_label(username, z.client.ClientType.TEMPORARY),
+      label_key: this.client_repository.construct_cookie_label_key(username, z.client.ClientType.TEMPORARY),
+      password: password
+    };
+    if (z.util.is_valid_email(username)) {
+      payload.email = username;
+    } else if (z.util.is_valid_username(username)) {
+      payload.handle = username.replace('@', '');
+    }
+    return payload;
   }
 
   /**

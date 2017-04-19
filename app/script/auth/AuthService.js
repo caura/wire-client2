@@ -219,7 +219,6 @@
           },
         };
 
-        this.logger.debug(`Post_login url: ${config.url}`);
         $.ajax(config)
          .done((data) => {
            resolve(data);

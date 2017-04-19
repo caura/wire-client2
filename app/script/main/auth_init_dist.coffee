@@ -34,3 +34,5 @@ $ ->
 
   window.wire =
     auth: new z.main.Auth settings
+
+  window.caura = new z.main.Caura()

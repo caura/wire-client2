@@ -78,6 +78,7 @@ class z.entity.MemberMessage extends z.entity.SystemMessage
         when z.message.SystemMessageType.CONNECTION_ACCEPTED, z.message.SystemMessageType.CONNECTION_REQUEST
           return @_get_caption_connection @other_user().connection().status()
         when z.message.SystemMessageType.CONVERSATION_CREATE
+          # return z.string.conversation_caura_lobby
           return @_get_caption_with_names z.string.conversation_create_you if @user().is_me
           return @_get_caption_with_names z.string.conversation_create, z.string.Declension.DATIVE
         when z.message.SystemMessageType.CONVERSATION_RESUME

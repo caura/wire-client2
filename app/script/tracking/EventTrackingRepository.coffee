@@ -26,6 +26,8 @@ LOCALYTICS =
     'localhost'
     'zinfra.io'
     'caura.co'
+    'w.caura.co'
+    'wire.caura.co'
   ]
 
 RAYGUN =
@@ -240,6 +242,8 @@ class z.tracking.EventTrackingRepository
         'localhost'
         'wire.ms'
         'caura.co'
+        'w.caura.co'
+        'wire.caura.co'
       ]
       ignore3rdPartyErrors: true
 

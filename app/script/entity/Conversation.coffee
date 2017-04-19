@@ -139,6 +139,9 @@ class z.entity.Conversation
     @unread_message_count = ko.pureComputed =>
       return (message_et for message_et in @unread_events() when not message_et.user().is_me).length
 
+    @is_official_conversation = ko.pureComputed =>
+      return @display_name() in ['Caura Lobby', 'Caura Team', 's2bot', 'annuthebot', 'Caura Bot', 'Annu the Bot']
+
     @unread_type = ko.pureComputed =>
       return z.conversation.ConversationUnreadType.CONNECT if @connection().status() is z.user.ConnectionStatus.SENT
       unread_type = z.conversation.ConversationUnreadType.UNREAD
@@ -178,6 +181,8 @@ class z.entity.Conversation
         return (@participating_user_ets().map (user_et) -> user_et.first_name()).join ', ' if @participating_user_ets().length > 0
         return z.localization.Localizer.get_text z.string.conversations_empty_conversation if @participating_user_ids().length is 0
         return '…'
+      else if @name() in ['s2bot', 'annuthebot', 'entropybot']
+        return 'Caura Bot'
       else
         return @name()
 

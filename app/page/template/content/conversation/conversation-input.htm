@@ -46,31 +46,9 @@
 
           <!-- ko if: input().length === 0 -->
 
-            <span id="conversation-input-ephemeral"
-                  class="controls-right-button conversation-input-ephemeral"
-                  data-bind="l10n_tooltip: z.string.tooltip_conversation_ephemeral"
-                  data-uie-name="do-set-ephemeral-timer">
-              <!-- ko if: has_ephemeral_timer() && conversation_et()-->
-                <div class="ephemeral-timer-button">
-                  <span class="ephemeral-timer-button-unit" data-bind="text: z.util.format_milliseconds_short(conversation_et().ephemeral_timer())[1]"></span>
-                  <span class="full-screen" data-bind="text: z.util.format_milliseconds_short(conversation_et().ephemeral_timer())[0]"></span>
-                </div>
-              <!-- /ko -->
-              <!-- ko ifnot: has_ephemeral_timer() -->
-                <span class="button-icon-large icon-hourglass"></span>
-              <!-- /ko -->
-                <context-menu class="controls-right-button-ephemeral-context"
-                              params="entries: get_context_menu_entries(), placement: 'top', tag: 'ephemeral'"
-                              tabindex="-1"></context-menu>
-            </span>
+          <!-- caura: wire conversation-input-ephemeral placeholder -->
 
-            <label id="conversation-input-photo"
-                   class="controls-right-button button-icon-large"
-                   data-bind="attr: {'title': picture_tooltip}, css: has_ephemeral_timer() ? 'icon-library-timed': 'icon-library'">
-              <input data-bind="file_select: upload_images" type="file" multiple="multiple"
-                     accept=".jpg-large, image/jpeg, image/png, image/bmp, image/gif" data-uie-name="do-share-image"/>
-            </label>
-
+          <!-- caura: remove not needed message icon -->
             <label id="conversation-input-files"
                      class="controls-right-button button-icon-large"
                      data-bind="attr: {'title': file_tooltip}, css: has_ephemeral_timer() ? 'icon-attachment-timed': 'icon-attachment'">
@@ -78,10 +56,7 @@
                        accept="*" data-uie-name="do-share-file"/>
             </label>
 
-            <span class="controls-right-button button-icon-large"
-                  data-bind="click: ping, attr: {'title': ping_tooltip}, css:{'disabled': ping_disabled, 'icon-ping-timed': has_ephemeral_timer(), 'icon-ping': !has_ephemeral_timer()}"
-                  data-uie-name="do-ping">
-            </span>
+            <!-- caura: remove not needed message icon -->
           <!-- /ko -->
 
         <!-- /ko -->

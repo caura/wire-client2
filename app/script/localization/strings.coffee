@@ -17,7 +17,7 @@
 #
 
 #General terms
-z.string.wire = 'Wire'
+z.string.wire = 'Caura'
 z.string.wire_macos = 'Wire for macOS'
 z.string.wire_windows = 'Wire for Windows'
 z.string.wire_linux = 'Wire for Linux'
@@ -225,6 +225,7 @@ z.string.conversation_connection_accepted = 'Connected'
 z.string.conversation_connection_blocked = 'Blocked'
 z.string.conversation_connection_cancel_request = 'Cancel connection request'
 z.string.conversation_create = ' started a conversation with %@names'
+z.string.conversation_caura_lobby = ' welcomes you to a Lobby'
 z.string.conversation_create_you = ' started a conversation with %@names'
 z.string.conversation_device_started_using_one = ' started using'
 z.string.conversation_device_started_using_many = ' started using'
@@ -602,6 +603,8 @@ z.string.tooltip_preferences_rename = 'Change your name'
 z.string.tooltip_search_close = 'Close (Esc)'
 
 # App loading
+z.string.init_pre_auth = 'Scaling Bot Computing Resources'
+z.string.init_cannot_continue = 'All Computing Capacity is Used'
 z.string.init_received_access_token = 'Access granted'
 z.string.init_received_self_user = 'Hello, %name.'
 z.string.init_sessions_expectation = 'We need to initialize %sessions sessions'

@@ -235,8 +235,13 @@
         <span class="icon-plus" data-bind="visible: message.type === z.event.Backend.CONVERSATION.MEMBER_JOIN"></span>
       </div>
       <div class="message-header-label">
+        <!-- ko if: message.sender_name() === 'Caura' -->
+        <span class="ellipsis" data-bind="text: 'Welcome to Caura Lobby'"></span>
+        <!-- /ko -->
+        <!-- ko ifnot: message.sender_name() === 'Caura' -->
         <span class="label-bold" data-bind='text: message.sender_name()'></span>
         <span class="ellipsis" data-bind="text: message.caption()"></span>
+        <!-- /ko -->
         <hr class="message-header-line" />
       </div>
       <!-- ko if: message.type === z.event.Backend.CONVERSATION.MEMBER_JOIN || message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE -->

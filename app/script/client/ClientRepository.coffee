@@ -392,6 +392,8 @@ class z.client.ClientRepository
     if not password
       @logger.error "Could not delete client '#{client_id}' because password is missing"
       Promise.reject new z.client.ClientError z.client.ClientError::TYPE.REQUEST_FORBIDDEN
+    # caura: test
+    user = @self_user()
 
     @client_service.delete_client client_id, password
     .then =>

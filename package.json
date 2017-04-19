@@ -44,6 +44,8 @@
     "lint-fix": "eslint --fix -c .eslintrc.yaml --ignore-path .gitignore --quiet app/script/**/*.js test/**/*.js",
     "postinstall": "grunt init",
     "start": "grunt",
+    "start_prod": "grunt --env=prod",
+    "start_dev": "grunt --env=dev",
     "test": "yarn run lint && grunt check && grunt test"
   },
   "repository": {

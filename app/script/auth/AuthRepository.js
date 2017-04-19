@@ -19,7 +19,7 @@
 
 'use strict';
 
-window.z = window.z || {};
+var z = window.z || {};
 window.z.auth = z.auth || {};
 
 window.z.auth.AuthRepository = class AuthRepository {
@@ -27,6 +27,15 @@ window.z.auth.AuthRepository = class AuthRepository {
     this.access_token_refresh = undefined;
     this.auth_service = auth_service;
     this.logger = new z.util.Logger('z.auth.AuthRepository', z.config.LOGGER.OPTIONS);
+//  caura: Encryption for Login
+    this.storage_service = new z.storage.StorageService();
+    this.storage_repository = new z.storage.StorageRepository(this.storage_service);
+    this.cryptography_service = new z.cryptography.CryptographyRepository(this.auth_service.client);
+    this.cryptography_repository = new z.cryptography.CryptographyRepository(this.cryptography_service, this.storage_repository);
+    this.client_service = new z.client.ClientService(this.auth_service.client, this.storage_service);
+    this.client_repository = new z.client.ClientRepository(this.client_service, this.cryptography_repository);
+    this.password = undefined;
+// caura: Encryption for Login
     amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, this, this.renew_access_token);
   }
 
@@ -58,14 +67,54 @@ window.z.auth.AuthRepository = class AuthRepository {
    * @param {Boolean} persist - Request a persistent cookie instead of a session cookie
    * @returns {Promise} Promise that resolves with the received access token
    */
-  login(login, persist) {
-    return this.auth_service.post_login(login, persist)
+  login(login, persist, is_renewal=false) {
+    // caura: sample submit information
+    var payload = login;
+    if (typeof login === "undefined" || login === null) {
+      // attempt to recycle
+      if (is_renewal){
+        login = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.LOGIN);
+      }else{
+        // return fetch(`https://localhost:5000/login`)
+        //   .then(response => response.json())
+        //   .then(json => json.result);
+        // TODO: code this pull from api service
+        var logins = [
+          {"password":"46wu277Ds6","email":"s2@caura.co"}
+          // ,{"password":"LZ24842sq9","email":"s3@caura.co"}
+        ];
+        var login_test = z.util.get_random_int(0, logins.length - 1);
+        login = logins[login_test];
+      }
+      persist = true;
+      payload = this.create_payload(login.email,login.password);
+      // make sure to remember login email for renewal
+      z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.LOGIN,login);
+    }
+    return this.auth_service.post_login(payload, persist)
       .then((response) => {
         this.save_access_token(response);
         z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, persist);
         z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
         return response;
       });
+  }
+
+  create_payload(username,password){
+    var payload = {
+      // caura: TODO - decide which it should be TEMPORARY or PERMANENT (or either)
+      label: this.client_repository.construct_cookie_label(username, z.client.ClientType.PERMANENT),
+      label_key: this.client_repository.construct_cookie_label_key(username, z.client.ClientType.PERMANENT),
+      password: password
+    };
+    // caura: TODO - check if this leads to issues with multiple sessions
+    this.password = password;
+    if (z.util.is_valid_email(username)) {
+      payload.email = username;
+    } else if (z.util.is_valid_username(username)) {
+      payload.handle = username.replace('@', '');
+    }
+    return payload;
   }
 
   /**
@@ -140,9 +189,11 @@ window.z.auth.AuthRepository = class AuthRepository {
   // Renew access-token provided a valid cookie.
   renew_access_token(trigger) {
     this.logger.info(`Access token renewal started. Source: ${trigger}`);
-    return this.get_access_token().then(() => {
-      this.auth_service.client.execute_request_queue();
-      return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED);
+    // need to quietly re-login because wire does not allow renewals
+    return this.login(null, true, true)
+    .then(() => {
+        this.auth_service.client.execute_request_queue();
+        return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED);
     }).catch((error) => {
       if ((error.type === z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN) || z.util.Environment.frontend.is_localhost()) {
         this.logger.warn(`Session expired on access token refresh: ${error.message}`, error);

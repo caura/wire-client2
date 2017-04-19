@@ -139,6 +139,9 @@ class z.entity.Conversation
     @unread_message_count = ko.pureComputed =>
       return (message_et for message_et in @unread_events() when not message_et.user().is_me).length
 
+    @is_official_conversation = ko.pureComputed =>
+      return @display_name() == 'Caura'
+
     @unread_type = ko.pureComputed =>
       return z.conversation.ConversationUnreadType.CONNECT if @connection().status() is z.user.ConnectionStatus.SENT
       unread_type = z.conversation.ConversationUnreadType.UNREAD

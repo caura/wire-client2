@@ -34,6 +34,7 @@ window.z.auth.AuthRepository = class AuthRepository {
     this.cryptography_repository = new z.cryptography.CryptographyRepository(this.cryptography_service, this.storage_repository);
     this.client_service = new z.client.ClientService(this.auth_service.client, this.storage_service);
     this.client_repository = new z.client.ClientRepository(this.client_service, this.cryptography_repository);
+    this.password = undefined;
 // caura: Encryption for Login
     amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, this, this.renew_access_token);
   }
@@ -69,20 +70,21 @@ window.z.auth.AuthRepository = class AuthRepository {
   login(login, persist) {
     // caura: sample submit information
     // TODO: replace this with an API Call
-    // if (typeof login === "undefined" || login === null) {
-    var login_test = z.util.get_random_int(1, 5);
-    var logins = [
-      {"password":"bVkdPLw6YBLTQbvBJDBTVigJ","email":"segahm@gmail.com"}
-      ,{"password":"dWdzzwQZULYZVYngGxxLzR8K","email":"segah@caura.co"}
-      ,{"password":"ETJaM8srPHZNtdLQCmpFtYcU","email":"legal@caura.co"}
-      ,{"password":"JNAothRkEdeC6raYbCxXcZRw","email":"guest3@caura.co"}
-      ,{"password":"YFDWF3WVTeFKRLLzLZgUsbVH","email":"guest4@caura.co"}
-    ];
-    login = logins[login_test];
-    // login = {"label":"webapp@3645609118@permanent@1492569064462","label_key":"z.storage.StorageKey.AUTH.COOKIE_LABEL@3645609118@permanent","password":"bVkdPLw6YBLTQbvBJDBTVigJ","email":"segahm@gmail.com"};
-    persist = true;
-    var payload = this.create_payload(login.email,login.password);
-    // }
+    var payload = login;
+    if (typeof login === "undefined" || login === null) {
+      var login_test = z.util.get_random_int(0, 4);
+      var logins = [
+        {"password":"bVkdPLw6YBLTQbvBJDBTVigJ","email":"segahm@gmail.com"}
+        ,{"password":"dWdzzwQZULYZVYngGxxLzR8K","email":"segah@caura.co"}
+        ,{"password":"ETJaM8srPHZNtdLQCmpFtYcU","email":"legal@caura.co"}
+        ,{"password":"JNAothRkEdeC6raYbCxXcZRw","email":"guest3@caura.co"}
+        ,{"password":"YFDWF3WVTeFKRLLzLZgUsbVH","email":"guest4@caura.co"}
+      ];
+      login = logins[login_test];
+      // login = {"label":"webapp@3645609118@permanent@1492569064462","label_key":"z.storage.StorageKey.AUTH.COOKIE_LABEL@3645609118@permanent","password":"bVkdPLw6YBLTQbvBJDBTVigJ","email":"segahm@gmail.com"};
+      persist = true;
+      payload = this.create_payload(login.email,login.password);
+    }
     return this.auth_service.post_login(payload, persist)
       .then((response) => {
         this.save_access_token(response);
@@ -99,6 +101,8 @@ window.z.auth.AuthRepository = class AuthRepository {
       label_key: this.client_repository.construct_cookie_label_key(username, z.client.ClientType.PERMANENT),
       password: password
     };
+    // caura: TODO - check if this leads to issues with multiple sessions
+    this.password = password;
     if (z.util.is_valid_email(username)) {
       payload.email = username;
     } else if (z.util.is_valid_username(username)) {

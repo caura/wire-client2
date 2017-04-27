@@ -43,9 +43,6 @@ class z.main.App
     @init_app()
     @init_service_worker()
 
-    # caura: looks like we need this globally to register a new client
-    @password = ko.observable ''
-
 
   ###############################################################################
   # Instantiation
@@ -270,16 +267,15 @@ class z.main.App
     @repository.user.get_me()
     .then (user_et) =>
       @logger.info "Loaded self user with ID '#{user_et.id}'"
-      @pending_server_request false
       if not user_et.email() and not user_et.phone()
         throw new Error 'User does not have a verified identity'
       @service.storage.init user_et.id
       .then =>
         @_check_user_information user_et
-      # .then =>
-      #     # caura: need to pass the client info to ClientRepository
-      #   @repository.client.init user_et
-      # .then =>
+      .then =>
+          # caura: need to pass the client info to ClientRepository
+        @repository.client.init user_et
+      .then =>
         return user_et
     .catch (error) ->
       if not error instanceof z.storage.StorageError
@@ -541,6 +537,13 @@ class z.main.App
       # @_has_errors()
       # @_set_hash z.auth.AuthView.MODE.ACCOUNT_LOGIN
 
+  # click_on_remove_device: (device_et, event) =>
+  #   # amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.REMOVE_DEVICE,
+  #     action: (password) =>
+  #       @repository.client.delete_client device_et.id, password
+  #     data: device_et.model
+  #   # @repository.event.stopPropagation()
+
   _register_client: =>
     # caura: remove all previous clients associated with a user:
     @logger.info "Clearing Clients Remotely from Previous Sessions"
@@ -548,13 +551,14 @@ class z.main.App
     .then (clients_ets) =>
       promises = []
       clients_ets.forEach (client_et) =>
-        promises.push @repository.client.delete_client client_et.id, @password()
+        @logger.info "Deleting a client"
+        promises.push @repository.client.delete_client client_et.id, @auth.repository.password
       return Promise.all promises
     .then =>
-      logger.info "Registering a client"
-      @repository.client.register_client @password()
+      @logger.info "Registering a client"
+      @repository.client.register_client @auth.repository.password
     .then (client_observable) =>
-      logger.info "Client Observable"
+      @logger.info "Client Observable"
       @repository.event.current_client = client_observable
       @repository.event.initialize_last_notification_id()
     # .then =>

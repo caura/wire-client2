@@ -291,11 +291,9 @@ class z.ViewModel.AuthViewModel
   # Sign in using a password login.
   login_password: =>
     return if @pending_server_request() or not @can_login_password()
-    # caura: for guests, there is no form to validate
-    if not @guest_authentication
-      return if not @_validate_input z.auth.AuthView.MODE.ACCOUNT_PASSWORD
+    return if not @_validate_input z.auth.AuthView.MODE.ACCOUNT_PASSWORD
     @pending_server_request true
-    # if not guest_authentication
+
     payload = @_create_payload z.auth.AuthView.MODE.ACCOUNT_PASSWORD
     @auth.repository.login payload, @persist()
     .then =>

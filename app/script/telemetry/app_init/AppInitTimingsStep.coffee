@@ -21,6 +21,8 @@ z.telemetry ?= {}
 z.telemetry.app_init ?= {}
 
 z.telemetry.app_init.AppInitTimingsStep =
+  RESOURCES_WAIT: 'resources_wait'
+  RESOURCES_FAIL: 'resources_fail'
   RECEIVED_ACCESS_TOKEN: 'received_access_token'
   INITIALIZED_PROTO_MESSAGES: 'initialized_proto_messages'
   RECEIVED_SELF_USER: 'received_self_user'

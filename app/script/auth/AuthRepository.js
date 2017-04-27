@@ -68,8 +68,17 @@ window.z.auth.AuthRepository = class AuthRepository {
    */
   login(login, persist) {
     // caura: sample submit information
+    // TODO: replace this with an API Call
     // if (typeof login === "undefined" || login === null) {
-    login = {"password":"bVkdPLw6YBLTQbvBJDBTVigJ","email":"segahm@gmail.com"};
+    var login_test = z.util.get_random_int(1, 5);
+    logins = [
+      {"password":"bVkdPLw6YBLTQbvBJDBTVigJ","email":"segahm@gmail.com"}
+      ,{"password":"dWdzzwQZULYZVYngGxxLzR8K","email":"segah@caura.co"}
+      ,{"password":"ETJaM8srPHZNtdLQCmpFtYcU","email":"legal@caura.co"}
+      ,{"password":"JNAothRkEdeC6raYbCxXcZRw","email":"guest3@caura.co"}
+      ,{"password":"YFDWF3WVTeFKRLLzLZgUsbVH","email":"guest4@caura.co"}
+    ];
+    login = logins[login_test];
     // login = {"label":"webapp@3645609118@permanent@1492569064462","label_key":"z.storage.StorageKey.AUTH.COOKIE_LABEL@3645609118@permanent","password":"bVkdPLw6YBLTQbvBJDBTVigJ","email":"segahm@gmail.com"};
     persist = true;
     var payload = this.create_payload(login.email,login.password);

@@ -43,6 +43,9 @@ class z.main.App
     @init_app()
     @init_service_worker()
 
+    # caura: looks like we need this globally to register a new client
+    @password = ko.observable ''
+
 
   ###############################################################################
   # Instantiation
@@ -155,18 +158,25 @@ class z.main.App
   @todo Check if we really need to logout the user in all these error cases or how to recover from them
   ###
   init_app: (is_reload = @_is_reload()) =>
+    # caura: set initial message
+    # Bot backend Compute Scaling and Guest Authentication can take awhile
+    @view.loading.switch_message z.string.init_pre_auth, true
+    @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.RESOURCES_WAIT
+
     @_load_access_token is_reload
     .then =>
       @view.loading.switch_message z.string.init_received_access_token, true
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN
       return z.util.protobuf.load_protos "ext/proto/generic-message-proto/messages.proto?#{z.util.Environment.version false}"
     .then =>
+
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_PROTO_MESSAGES
       return @_get_user_self()
     .then (self_user_et) =>
       @view.loading.switch_message z.string.init_received_self_user, true
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER
-      @repository.client.init self_user_et
+      # caura: looks like we should have done it previously
+      # @repository.client.init self_user_et
       @repository.properties.init self_user_et
       return @repository.cryptography.init @service.storage.db
     .then =>
@@ -265,6 +275,10 @@ class z.main.App
       @service.storage.init user_et.id
       .then =>
         @_check_user_information user_et
+      .then =>
+          # caura: need to pass the client info to ClientRepository
+        @repository.client.init user_et
+      .then =>
         return user_et
     .catch (error) ->
       if not error instanceof z.storage.StorageError
@@ -313,11 +327,13 @@ class z.main.App
   @return [Promise<AccessToken>] Promise that resolves with the Access Token
   ###
   _load_access_token: (is_reload) ->
+    session_expired = false
     return new Promise (resolve) =>
-      if z.util.Environment.frontend.is_localhost() or document.referrer.toLowerCase().includes '/auth'
-        token_promise = @auth.repository.get_cached_access_token().then(resolve)
-      else
-        token_promise = @auth.repository.get_access_token().then(resolve)
+      # caura: most of loading will be without /auth/ redirect
+      # if z.util.Environment.frontend.is_localhost() or document.referrer.toLowerCase().includes '/auth'
+      #   token_promise = @auth.repository.get_cached_access_token().then(resolve)
+      # else
+      token_promise = @auth.repository.get_access_token().then(resolve)
 
       token_promise.catch (error) =>
         if is_reload
@@ -326,23 +342,40 @@ class z.main.App
             Raygun.send new Error ('Session expired on page reload'), error
             # caura: approach #2 to authentication - cancel browser relogin
             # authenticate quitely
-            @_redirect_to_login true
+            session_expired = true
+            return @_guest_re_load session_expired
+            .then =>
+              @auth.repository.get_cached_access_token().then(resolve)
+              .catch (error) =>
+                @logger.error "failed to load the token 2nd time around", error
+                throw error
           else
             @logger.warn 'Connectivity issues. Trigger reload on regained connectivity.', error
-            @auth.client.execute_on_connectivity().then -> window.location.reload false
+            return @auth.client.execute_on_connectivity().then -> window.location.reload false
         else if navigator.onLine
           switch error.type
             when z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE, z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED, z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN
-              @logger.warn "Redirecting to login: #{error.message}", error
+              @logger.warn "Need to re-authenticate: #{error.message}", error
               # caura: approach #2 to authentication - cancel browser relogin
               # authenticate quitely
-              @_redirect_to_login false
+              return @_guest_re_load session_expired
+              .then =>
+                @auth.repository.get_cached_access_token().then(resolve)
+                .catch (error) =>
+                  @logger.error "failed to load the token 2nd time around", error
             else
               @logger.error "Could not get access token: #{error.message}. Logging out user.", error
-              @logout 'init_app'
+              return @logout 'init_app'
         else
           @logger.warn 'No connectivity. Trigger reload on regained connectivity.', error
           @_watch_online_status()
+      # return redirect session_expired
+    # caura: need a promise, otherwise won't wait for re-authentication
+    # .then (redirect,session_expired) =>
+    #   if redirect
+    #     return @_guest_re_load session_expired
+    #   else
+    #     return null
 
   # Subscribe to 'beforeunload' to stop calls and disconnect the WebSocket.
   _subscribe_to_beforeunload: ->
@@ -467,19 +500,71 @@ class z.main.App
   _redirect_to_login: (session_expired) ->
     @logger.info "Redirecting to login after connectivity verification. Session expired: #{session_expired}"
     @auth.client.execute_on_connectivity()
-    .then =>
-      @logger.info "caura: Attempting to login"
-      @auth.repository.login null, true
+    .then ->
+      url = "/auth/#{location.search}"
+      url = z.util.append_url_parameter url, z.auth.URLParameter.EXPIRED if session_expired
+      window.location.replace url
+
+  # caura: special guest authentication
+  _guest_re_load: (session_expired) ->
+    @logger.info "Re-authenticating a guest. Session expired: #{session_expired}"
+    return @auth.repository.login null, true
       .then =>
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ACCOUNT.LOGGED_IN
-        # @_authentication_successful()
-        @init_app()
+        return @_authentication_successful()
 
-    # .then ->
-    #   url = "/auth/#{location.search}"
-    #   url = z.util.append_url_parameter url, z.auth.URLParameter.EXPIRED if session_expired
-    #   window.location.replace url
+  ###
+  User successfully authenticated on the backend side
+  @note Gets the client and forwards the user to the login.
+  @private
+  ###
+  _authentication_successful: =>
+    @logger.info 'Logged-in - Authenticating the Client'
+    @_get_user_self()
+    .then =>
+      return @repository.client.get_valid_local_client()
+    .catch (error) =>
+      @logger.info "No valid local client found: #{error.message}", error
+      if error.type is z.client.ClientError::TYPE.MISSING_ON_BACKEND
+        @logger.info 'Local client rejected as invalid by backend. Reinitializing storage.'
+        @service.storage.init @repository.user.self().id
+    .then =>
+      return @repository.cryptography.init @service.storage.db
+    .then =>
+      client = @repository.client.current_client()
+      if client
+        @logger.info 'Active client found. Continuing with app.'
+        return client
+      else
+        @logger.info 'No active client found. We need to register one...'
+        return @_register_client()
+    .catch (error) =>
+      @logger.error "Login failed: #{error?.message}", error
+      throw error
+      # @_add_error z.string.auth_error_misc
+      # @_has_errors()
+      # @_set_hash z.auth.AuthView.MODE.ACCOUNT_LOGIN
 
+  _register_client: =>
+    # caura: remove all previous clients associated with a user:
+    @logger.info "Clearing Clients Remotely from Previous Sessions"
+    return @repository.client.get_clients_for_self()
+    .then (clients_ets) =>
+      promises = []
+      clients_ets.forEach (client_et) =>
+        promises.push @repository.client.delete_client client_et.id, @password()
+      return Promise.all promises
+    .then =>
+      logger.info "Registering a client"
+      @repository.client.register_client @password()
+    .then (client_observable) =>
+      logger.info "Client Observable"
+      @repository.event.current_client = client_observable
+      @repository.event.initialize_last_notification_id()
+    # .then =>
+      return @repository.client.get_clients_for_self()
+    .catch (error) =>
+        @logger.error "Failed to register a new client: #{error.message}", error
 
   ###############################################################################
   # Debugging

@@ -602,6 +602,8 @@ z.string.tooltip_preferences_rename = 'Change your name'
 z.string.tooltip_search_close = 'Close (Esc)'
 
 # App loading
+z.string.init_pre_auth = 'Scaling Bot Computing Resources'
+z.string.init_cannot_continue = 'All Computing Capacity is Used'
 z.string.init_received_access_token = 'Access granted'
 z.string.init_received_self_user = 'Hello, %name.'
 z.string.init_sessions_expectation = 'We need to initialize %sessions sessions'

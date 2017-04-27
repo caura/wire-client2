@@ -290,8 +290,7 @@ class z.ViewModel.AuthViewModel
 
   # Sign in using a password login.
   login_password: =>
-    return if @pending_server_request() or not @can_login_password()
-    return if not @_validate_input z.auth.AuthView.MODE.ACCOUNT_PASSWORD
+    return if @pending_server_request() or not @can_login_password() or not @_validate_input z.auth.AuthView.MODE.ACCOUNT_PASSWORD
     @pending_server_request true
 
     payload = @_create_payload z.auth.AuthView.MODE.ACCOUNT_PASSWORD

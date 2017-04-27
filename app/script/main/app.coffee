@@ -270,15 +270,16 @@ class z.main.App
     @repository.user.get_me()
     .then (user_et) =>
       @logger.info "Loaded self user with ID '#{user_et.id}'"
+      @pending_server_request false
       if not user_et.email() and not user_et.phone()
         throw new Error 'User does not have a verified identity'
       @service.storage.init user_et.id
       .then =>
         @_check_user_information user_et
-      .then =>
-          # caura: need to pass the client info to ClientRepository
-        @repository.client.init user_et
-      .then =>
+      # .then =>
+      #     # caura: need to pass the client info to ClientRepository
+      #   @repository.client.init user_et
+      # .then =>
         return user_et
     .catch (error) ->
       if not error instanceof z.storage.StorageError
@@ -330,10 +331,10 @@ class z.main.App
     session_expired = false
     return new Promise (resolve) =>
       # caura: most of loading will be without /auth/ redirect
-      # if z.util.Environment.frontend.is_localhost() or document.referrer.toLowerCase().includes '/auth'
-      #   token_promise = @auth.repository.get_cached_access_token().then(resolve)
-      # else
-      token_promise = @auth.repository.get_access_token().then(resolve)
+      if z.util.Environment.frontend.is_localhost() or document.referrer.toLowerCase().includes '/auth'
+        token_promise = @auth.repository.get_cached_access_token().then(resolve)
+      else
+        token_promise = @auth.repository.get_access_token().then(resolve)
 
       token_promise.catch (error) =>
         if is_reload
@@ -345,6 +346,7 @@ class z.main.App
             session_expired = true
             return @_guest_re_load session_expired
             .then =>
+              @logger.info "Attempting get_cached_access_token 2nd time"
               @auth.repository.get_cached_access_token().then(resolve)
               .catch (error) =>
                 @logger.error "failed to load the token 2nd time around", error
@@ -360,22 +362,16 @@ class z.main.App
               # authenticate quitely
               return @_guest_re_load session_expired
               .then =>
+                @logger.info "Attempting get_cached_access_token 2nd time"
                 @auth.repository.get_cached_access_token().then(resolve)
                 .catch (error) =>
                   @logger.error "failed to load the token 2nd time around", error
             else
               @logger.error "Could not get access token: #{error.message}. Logging out user.", error
-              return @logout 'init_app'
+              @logout 'init_app'
         else
           @logger.warn 'No connectivity. Trigger reload on regained connectivity.', error
           @_watch_online_status()
-      # return redirect session_expired
-    # caura: need a promise, otherwise won't wait for re-authentication
-    # .then (redirect,session_expired) =>
-    #   if redirect
-    #     return @_guest_re_load session_expired
-    #   else
-    #     return null
 
   # Subscribe to 'beforeunload' to stop calls and disconnect the WebSocket.
   _subscribe_to_beforeunload: ->

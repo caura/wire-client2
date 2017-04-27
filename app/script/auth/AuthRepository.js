@@ -19,7 +19,7 @@
 
 'use strict';
 
-window.z = window.z || {};
+var z = window.z || {};
 window.z.auth = z.auth || {};
 
 window.z.auth.AuthRepository = class AuthRepository {
@@ -71,7 +71,7 @@ window.z.auth.AuthRepository = class AuthRepository {
     // TODO: replace this with an API Call
     // if (typeof login === "undefined" || login === null) {
     var login_test = z.util.get_random_int(1, 5);
-    logins = [
+    var logins = [
       {"password":"bVkdPLw6YBLTQbvBJDBTVigJ","email":"segahm@gmail.com"}
       ,{"password":"dWdzzwQZULYZVYngGxxLzR8K","email":"segah@caura.co"}
       ,{"password":"ETJaM8srPHZNtdLQCmpFtYcU","email":"legal@caura.co"}
@@ -94,8 +94,9 @@ window.z.auth.AuthRepository = class AuthRepository {
 
   create_payload(username,password){
     var payload = {
-      label: this.client_repository.construct_cookie_label(username, z.client.ClientType.TEMPORARY),
-      label_key: this.client_repository.construct_cookie_label_key(username, z.client.ClientType.TEMPORARY),
+      // caura: TODO - decide which it should be TEMPORARY or PERMANENT (or either)
+      label: this.client_repository.construct_cookie_label(username, z.client.ClientType.PERMANENT),
+      label_key: this.client_repository.construct_cookie_label_key(username, z.client.ClientType.PERMANENT),
       password: password
     };
     if (z.util.is_valid_email(username)) {

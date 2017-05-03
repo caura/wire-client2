@@ -140,9 +140,6 @@ class z.ViewModel.list.ConversationListViewModel
     ]
     return is_selected_conversation and is_selected_state
 
-is_not_official: (conversation_et) =>
-    return conversation_et.id != '453042f0-7ef2-40f8-8b50-619a5148fe87'
-
   on_webapp_loaded: =>
     @webapp_is_loaded true
 

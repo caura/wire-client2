@@ -1223,7 +1223,7 @@ class z.ViewModel.AuthViewModel
     @auth.repository.logout()
     .then =>
       @auth.repository.delete_access_token()
-      window.location.replace '/hello_logout'
+      window.location.replace '/auth'
 
   ###
   User account has been verified.

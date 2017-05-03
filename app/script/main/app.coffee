@@ -3,7 +3,7 @@
 # Copyright (C) 2016 Wire Swiss GmbH
 #
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it under the teirms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
@@ -493,7 +493,14 @@ class z.main.App
     @logger.info "Redirecting to login after connectivity verification. Session expired: #{session_expired}"
     @auth.client.execute_on_connectivity()
     .then ->
+<<<<<<< HEAD
       @logger.info "!!!!!!! About to window.location.replace"
+=======
+      # caura: re-authenticate user a guest from the beginning (user should be assigned the same guest id)?
+      # url = '/'
+      # url = @_append_existing_parameters url
+      # window.location.replace url
+>>>>>>> origin/mydev
       url = "/auth/#{location.search}"
       url = z.util.append_url_parameter url, z.auth.URLParameter.EXPIRED if session_expired
       window.location.replace url

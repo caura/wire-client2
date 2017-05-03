@@ -17,7 +17,7 @@
 #
 
 #General terms
-z.string.wire = 'Wire'
+z.string.wire = 'Caura'
 z.string.wire_macos = 'Wire for macOS'
 z.string.wire_windows = 'Wire for Windows'
 z.string.wire_linux = 'Wire for Linux'

@@ -327,14 +327,14 @@ class z.main.App
     session_expired = false
     return new Promise (resolve) =>
       # caura: most of loading will be without /auth/ redirect
-      if z.util.Environment.frontend.is_localhost() or document.referrer.toLowerCase().includes '/auth'
+      if not is_reload and (z.util.Environment.frontend.is_localhost() or document.referrer.toLowerCase().includes '/auth')
         token_promise = @auth.repository.get_cached_access_token().then(resolve)
       else
         token_promise = @auth.repository.get_access_token().then(resolve)
 
       token_promise.catch (error) =>
         if is_reload
-          if error.type in [z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN, z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE]
+          if error.type in [z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN, z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE, z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED]
             @logger.error "Session expired on page reload: #{error.message}", error
             Raygun.send new Error ('Session expired on page reload'), error
             # caura: approach #2 to authentication - cancel browser relogin
@@ -493,6 +493,7 @@ class z.main.App
     @logger.info "Redirecting to login after connectivity verification. Session expired: #{session_expired}"
     @auth.client.execute_on_connectivity()
     .then ->
+      @logger.info "!!!!!!! About to window.location.replace"
       url = "/auth/#{location.search}"
       url = z.util.append_url_parameter url, z.auth.URLParameter.EXPIRED if session_expired
       window.location.replace url

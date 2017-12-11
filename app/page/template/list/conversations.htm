@@ -175,7 +175,6 @@
 
       <!-- ko foreach: conversations_unarchived -->
       <!-- caura: make sure only authorized conversations appear (no one adds our user) -->
-        <!-- ko if: is_official_conversation() -->
         <li class="left-list-item"
           data-bind="css: {'text-theme': $parent.is_selected_conversation($data)}">
           <div class="overlay"></div>
@@ -198,20 +197,8 @@
                data-uie-name="item-conversation"></div>
           <!-- caura: wire right column placeholder -->
         </li>
-        <!-- /ko -->
       <!-- /ko -->
     </ul>
-    <!-- /ko -->
-    <!-- ko if: $root.first_run() || (conversations_unarchived().length === 0 && connect_requests().length === 0) -->
-      <!-- ko if: conversations_archived().length === 0 || $root.first_run()  -->
-        <div class="conversation-hint-container" data-uie-name="start-conversation-hint">
-          <div class="conversation-hint-container-text" data-bind="l10n_text: z.string.conversations_no_conversations"></div>
-          <span class="arrow-down"></span>
-        </div>
-      <!-- /ko -->
-      <!-- ko if: conversations_archived().length > 0 && !$root.first_run() -->
-        <div class="full-screen flex-center label-xs text-white" data-bind="l10n_text: z.string.conversations_all_archived"></div>
-      <!-- /ko -->
     <!-- /ko -->
   </div>
   <div class="conversations-footer">

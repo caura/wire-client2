@@ -174,7 +174,8 @@
       <!-- /ko -->
 
       <!-- ko foreach: conversations_unarchived -->
-        <!-- ko ifnot: is_official_conversation() -->
+      <!-- caura: make sure only authorized conversations appear (no one adds our user) -->
+        <!-- ko if: is_official_conversation() -->
         <li class="left-list-item"
           data-bind="css: {'text-theme': $parent.is_selected_conversation($data)}">
           <div class="overlay"></div>

@@ -140,7 +140,7 @@ class z.entity.Conversation
       return (message_et for message_et in @unread_events() when not message_et.user().is_me).length
 
     @is_official_conversation = ko.pureComputed =>
-      return @display_name() == 'Caura'
+      return @display_name() in ['Caura Lobby', 'Caura Team', 's2bot', 'annuthebot', 'Caura Bot', 'Annu the Bot']
 
     @unread_type = ko.pureComputed =>
       return z.conversation.ConversationUnreadType.CONNECT if @connection().status() is z.user.ConnectionStatus.SENT

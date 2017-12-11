@@ -31,24 +31,25 @@ class z.ViewModel.LoadingViewModel
     ko.applyBindings @, document.getElementById element_id
 
   switch_message: (message_locator, next_step = false, replace_content) =>
-    if not z.util.Environment.frontend.is_production()
-      _create_message = (message_locator, replacements) ->
-        replacements = ({placeholder: replacement[0], content: replacement[1]} for replacement in replacements)
-        return z.localization.Localizer.get_text
-          id: message_locator
-          replace: replacements
+    # we don't have localized versions for all the new Caura variables, so avoid calling this funtion
+    # if not z.util.Environment.frontend.is_production()
+    #   _create_message = (message_locator, replacements) ->
+    #     replacements = ({placeholder: replacement[0], content: replacement[1]} for replacement in replacements)
+    #     return z.localization.Localizer.get_text
+    #       id: message_locator
+    #       replace: replacements
 
-      @loading_message switch message_locator
-        when z.string.init_received_self_user
-          _create_message message_locator, [['%name', @user_repository.self().first_name()]]
-        when z.string.init_events_expectation
-          if replace_content[0] > 200
-            message_locator = z.string.init_events_expectation_long
-          _create_message message_locator, [['%events', replace_content[0]]]
-        when z.string.init_events_progress
-          _create_message message_locator, [['%progress', replace_content[0]], ['%total', replace_content[1]]]
-        else
-          z.localization.Localizer.get_text message_locator
+    #   @loading_message switch message_locator
+    #     when z.string.init_received_self_user
+    #       _create_message message_locator, [['%name', @user_repository.self().first_name()]]
+    #     when z.string.init_events_expectation
+    #       if replace_content[0] > 200
+    #         message_locator = z.string.init_events_expectation_long
+    #       _create_message message_locator, [['%events', replace_content[0]]]
+    #     when z.string.init_events_progress
+    #       _create_message message_locator, [['%progress', replace_content[0]], ['%total', replace_content[1]]]
+    #     else
+    #       z.localization.Localizer.get_text message_locator
 
     @_next_step() if next_step
 

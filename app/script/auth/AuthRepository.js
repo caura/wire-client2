@@ -103,7 +103,7 @@ window.z.auth.AuthRepository = class AuthRepository {
   create_payload(username,password){
     var payload = {
       // caura: TODO - decide which it should be TEMPORARY or PERMANENT (or either)
-      label: this.client_repository.construct_cookie_label(username, z.client.ClientType.PERMANENT),
+      label: this.client_repository.construct_cookie_label(username, z.client.ClientType.TEMPORARY),
       label_key: this.client_repository.construct_cookie_label_key(username, z.client.ClientType.PERMANENT),
       password: password
     };

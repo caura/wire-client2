@@ -26,6 +26,11 @@ window.z.main.Caura = class Caura {
       "lease/request",
       { dataType: "json" }
     ).then(function (creds) {
+      if( creds === false ){
+        self.logger.warn("no credentials available for lease");
+        return Promise.reject( new Error("no credentials available for lease") );
+      }
+
       self.logger.info("leased credentials",creds);
       return {
         email: creds.username,

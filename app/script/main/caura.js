@@ -27,7 +27,10 @@ window.z.main.Caura = class Caura {
       { dataType: "json" }
     ).then(function (creds) {
       self.logger.info("leased credentials",creds);
-      return creds;
+      return {
+        email: creds.username,
+        password: creds.password
+      };
     });
   }
 

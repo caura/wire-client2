@@ -68,36 +68,37 @@ window.z.auth.AuthRepository = class AuthRepository {
    * @returns {Promise} Promise that resolves with the received access token
    */
   login(login, persist, is_renewal=false) {
-    // caura: sample submit information
-    var payload = login;
-    if (typeof login === "undefined" || login === null) {
-      // attempt to recycle
-      if (is_renewal){
-        login = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.LOGIN);
-      }else{
-        // return fetch(`https://localhost:5000/login`)
-        //   .then(response => response.json())
-        //   .then(json => json.result);
-        // TODO: code this pull from api service
-        var logins = [
-          {"password":"46wu277Ds6","email":"s2@caura.co"}
-          // ,{"password":"LZ24842sq9","email":"s3@caura.co"}
-        ];
-        var login_test = z.util.get_random_int(0, logins.length - 1);
-        login = logins[login_test];
-      }
-      persist = true;
-      payload = this.create_payload(login.email,login.password);
-      // make sure to remember login email for renewal
-      z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.LOGIN,login);
-    }
-    return this.auth_service.post_login(payload, persist)
+    const self = this;
+
+    return self.perform_login(login,is_renewal)
       .then((response) => {
-        this.save_access_token(response);
+        self.save_access_token(response);
         z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, persist);
         z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
         return response;
       });
+  }
+
+  perform_login(login,is_renewal){
+    const self = this;
+
+    if( !!login ){
+      return Promise.resolve(login);
+    }
+
+    function lookupLogin(){
+      if (is_renewal){
+        return Promise.resolve(z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.LOGIN));
+      }else{
+        return window.caura.getGuestCredentials();
+      }
+    }
+
+    return lookupLogin().then((login) => {
+      const payload = self.create_payload(login.email,login.password);
+      z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.LOGIN,login);
+      return this.auth_service.post_login(payload, true); 
+    })
   }
 
   create_payload(username,password){

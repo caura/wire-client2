@@ -33,6 +33,7 @@ class z.conversation.ConversationRepository
   ###
   constructor: (@conversation_service, @asset_service, @user_repository, @giphy_repository, @cryptography_repository, @link_repository) ->
     @loaded_before = false
+    @lobby_conversation = null
     @logger = new z.util.Logger 'z.conversation.ConversationRepository', z.config.LOGGER.OPTIONS
 
     @conversation_mapper = new z.conversation.ConversationMapper()
@@ -162,10 +163,13 @@ class z.conversation.ConversationRepository
           remote_conversations = remote_conversations.filter (c) =>
             @logger.info "Conversation Name: #{c.name}"
             if c.name in ['Caura','Entropy AI','entropybot'] # || c.name == null
+              @logger.info "Deleting Conversation"
               if c.members.others and c.members.others.length > 0
                 @remove_bot c, c.members.others[0].service.id
               @clear_conversation c, true
               return false # filter out this conversation
+            else if c.name in ['Caura Lobby']
+              @lobby_conversation = c
             return true
         @loaded_before = true
         return @conversation_service.save_conversations_in_db remote_conversations

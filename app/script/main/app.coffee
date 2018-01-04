@@ -196,8 +196,6 @@ class z.main.App
       ]
       return Promise.all promises
     .then (response_array) =>
-      #always add our default bots
-      @repository.bot.add_bot 'entropybot'
       [conversation_ets, connection_ets] = response_array
       @view.loading.switch_message z.string.init_received_user_data, true
 
@@ -224,6 +222,9 @@ class z.main.App
 
       @repository.user.self().devices client_ets
       @logger.info 'App pre-loading completed'
+      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, @repository.conversation.lobby_conversation);
+      #always add our default bots
+      @repository.bot.add_bot 'entropybot'
       @_handle_url_params()
     .then =>
       @_show_ui()

@@ -49,10 +49,13 @@ z.bot.BotRepository = class BotRepository {
     return this.conversation_repository.create_new_conversation([], bot.channel_name)
     .then(conversation_et => {
       if (conversation_et == null) {
-        conversation_et = this.conversation_repository.active_conversation();
+        this.logger.error(`error returning conversation for add_bot`);
+        // conversation_et = this.conversation_repository.active_conversation();
       }
       this.conversation_repository.add_bot(conversation_et, bot.provider, bot.service);
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
+      window.setTimeout(function() {
+        return amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
+      }, 650);
     });
   }
 };

@@ -27,6 +27,7 @@ window.z.main.Caura = class Caura {
       { dataType: "json" }
     ).then(function (creds) {
       if( creds === false ){
+        // z.main.App.view.switch_message('All resources are taken. Please send us an email: hello@caura.co',true)
         self.logger.warn("no credentials available for lease");
         return Promise.reject( new Error("no credentials available for lease") );
       }

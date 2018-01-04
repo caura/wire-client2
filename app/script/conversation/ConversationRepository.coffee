@@ -32,6 +32,7 @@ class z.conversation.ConversationRepository
   @param link_repository [z.links.LinkPreviewRepository] Repository for link previews
   ###
   constructor: (@conversation_service, @asset_service, @user_repository, @giphy_repository, @cryptography_repository, @link_repository) ->
+    @loaded_before = false
     @logger = new z.util.Logger 'z.conversation.ConversationRepository', z.config.LOGGER.OPTIONS
 
     @conversation_mapper = new z.conversation.ConversationMapper()
@@ -157,15 +158,22 @@ class z.conversation.ConversationRepository
       .catch (error) =>
         @logger.error "Failed to get all conversations from backend: #{error.message}"
       .then (remote_conversations = []) =>
-        if remote_conversations.length > 0
-          return Promise.resolve @conversation_mapper.merge_conversations local_conversations, remote_conversations
-          .then (merged_conversations) => @conversation_service.save_conversations_in_db merged_conversations
-        else
-          return local_conversations
+        if not @loaded_before
+          remote_conversations = remote_conversations.filter (c) =>
+            @logger.info "Conversation Name: #{c.name}"
+            if c.name in ['Caura','Entropy AI','entropybot'] # || c.name == null
+              if c.members.others and c.members.others.length > 0
+                @remove_bot c, c.members.others[0].service.id
+              @clear_conversation c, true
+              return false # filter out this conversation
+            return true
+        @loaded_before = true
+        return @conversation_service.save_conversations_in_db remote_conversations
     .then (conversations) =>
       @save_conversations @conversation_mapper.map_conversations conversations
       amplify.publish z.event.WebApp.CONVERSATION.LOADED_STATES
       return @conversations()
+
 
   ###
   Get Message with given ID from the database.

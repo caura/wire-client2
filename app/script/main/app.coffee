@@ -160,6 +160,7 @@ class z.main.App
     @view.loading.switch_message z.string.init_pre_auth, true
     @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.RESOURCES_WAIT
 
+
     @_load_access_token is_reload
     .then =>
       @view.loading.switch_message z.string.init_received_access_token, true
@@ -195,6 +196,8 @@ class z.main.App
       ]
       return Promise.all promises
     .then (response_array) =>
+      #always add our default bots
+      @repository.bot.add_bot 'entropybot'
       [conversation_ets, connection_ets] = response_array
       @view.loading.switch_message z.string.init_received_user_data, true
 
@@ -236,6 +239,7 @@ class z.main.App
       @repository.audio.init true
       @repository.client.cleanup_clients_and_sessions true
       @logger.info 'App fully loaded'
+      # @repository.conversation.active_conversation = @view.conversation_list.lobbyConversation
     .catch (error) =>
       error_message = "Error during initialization of app version '#{z.util.Environment.version false}'"
       if z.util.Environment.electron

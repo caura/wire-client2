@@ -32,7 +32,7 @@ class z.ViewModel.list.ConversationListViewModel
   ###
   constructor: (element_id, @list_view_model, @content_view_model, @calling_repository, @conversation_repository, @user_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.list.ConversationListViewModel', z.config.LOGGER.OPTIONS
-
+    @lobbyConversation = null
     @joined_call = @calling_repository.joined_call
     @show_calls = ko.observable false
 
@@ -133,6 +133,8 @@ class z.ViewModel.list.ConversationListViewModel
 
   is_selected_conversation: (conversation_et) =>
     is_selected_conversation = conversation_et.id is @active_conversation_id()
+    if conversation_et.name == 'Caura Lobby'
+      @lobbyConversation = conversation_et
     is_selected_state = @content_state() in [
       z.ViewModel.content.CONTENT_STATE.COLLECTION
       z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS

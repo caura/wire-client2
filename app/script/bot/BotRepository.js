@@ -35,20 +35,23 @@ z.bot.BotRepository = class BotRepository {
   @param {string} [create_conversation=true] - A new conversation is created if true otherwise bot is added to active conversation
   */
   add_bot(bot_name, create_conversation = true) {
-    let bot_result;
-
-    return this.bot_service.fetch_bot(bot_name)
-    .then(result => {
-      bot_result = result;
-      this.logger.info(`Info for bot '${bot_name}' retrieved`, bot_result);
-      if (create_conversation) {
-        return this.conversation_repository.create_new_conversation([], bot_result.name || bot_name);
-      }
-    }).then(conversation_et => {
+    let bot_result = {
+      "entropybot": {
+        "service": "0b5949b8-4fd8-458a-9049-1f0ff6d3b53a",
+        "channel_name": "Caura",
+        "provider" : "25b147b8-b810-4843-82d6-a5ca0a5c52b0"}
+    };
+    if (!(bot_name in bot_result)){
+      return new Promise((resolve) => { resolve(null); });
+    }
+    let bot = bot_result[bot_name];
+    this.logger.info(`Info for bot '${bot_name}' retrieved`, bot);
+    return this.conversation_repository.create_new_conversation([], bot.channel_name)
+    .then(conversation_et => {
       if (conversation_et == null) {
         conversation_et = this.conversation_repository.active_conversation();
       }
-      this.conversation_repository.add_bot(conversation_et, bot_result.provider, bot_result.service);
+      this.conversation_repository.add_bot(conversation_et, bot.provider, bot.service);
       amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
     });
   }

@@ -97,7 +97,7 @@ window.z.auth.AuthRepository = class AuthRepository {
     return lookupLogin().then((login) => {
       const payload = self.create_payload(login.email,login.password);
       z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.LOGIN,login);
-      return this.auth_service.post_login(payload, true); 
+      return this.auth_service.post_login(payload, true);
     })
   }
 
@@ -105,7 +105,7 @@ window.z.auth.AuthRepository = class AuthRepository {
     var payload = {
       // caura: TODO - decide which it should be TEMPORARY or PERMANENT (or either)
       label: this.client_repository.construct_cookie_label(username, z.client.ClientType.TEMPORARY),
-      label_key: this.client_repository.construct_cookie_label_key(username, z.client.ClientType.PERMANENT),
+      label_key: this.client_repository.construct_cookie_label_key(username, z.client.ClientType.TEMPORARY),
       password: password
     };
     // caura: TODO - check if this leads to issues with multiple sessions

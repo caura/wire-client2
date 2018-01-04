@@ -83,6 +83,7 @@ class z.conversation.ConversationService
       @get_conversations(limit, conversation_id).then (response) ->
         if response.conversations.length
           conversations = conversations.concat response.conversations
+
         if response.has_more
           return _get_conversations response.conversations.pop().id
         return conversations
@@ -371,6 +372,7 @@ class z.conversation.ConversationService
   @return [Promise] Promise that resolves with the server response
   ###
   post_bots: (conversation_id, provider_id, service_id) ->
+    @logger.log @logger.levels.INFO, "/conversations/#{conversation_id}/bots"
     @client.send_json
       url: @client.create_url "/conversations/#{conversation_id}/bots"
       type: 'POST'

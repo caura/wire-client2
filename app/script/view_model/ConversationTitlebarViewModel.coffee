@@ -81,7 +81,7 @@ class z.ViewModel.ConversationTitlebarViewModel
     @logger.info "Maximizing call '#{@joined_call().id}' on user click"
 
   click_on_participants: =>
-    @show_participants()
+    # @show_participants()
 
   click_on_video_button: =>
     return if not @conversation_et()

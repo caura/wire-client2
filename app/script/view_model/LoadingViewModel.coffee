@@ -32,7 +32,7 @@ class z.ViewModel.LoadingViewModel
 
   switch_message: (message_locator, next_step = false, replace_content) =>
     # we don't have localized versions for all the new Caura variables, so avoid calling this funtion
-    if not z.util.Environment.frontend.is_production()
+    # if not z.util.Environment.frontend.is_production()
       _create_message = (message_locator, replacements) ->
         replacements = ({placeholder: replacement[0], content: replacement[1]} for replacement in replacements)
         return z.localization.Localizer.get_text

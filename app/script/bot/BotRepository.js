@@ -39,6 +39,10 @@ z.bot.BotRepository = class BotRepository {
       "entropybot": {
         "service": "0b5949b8-4fd8-458a-9049-1f0ff6d3b53a",
         "channel_name": "Caura",
+        "provider" : "25b147b8-b810-4843-82d6-a5ca0a5c52b0"},
+      "em": {
+        "service": "276e6cc3-867d-45a7-81c6-3db78e1b4d6f",
+        "channel_name": "Caura",
         "provider" : "25b147b8-b810-4843-82d6-a5ca0a5c52b0"}
     };
     if (!(bot_name in bot_result)){

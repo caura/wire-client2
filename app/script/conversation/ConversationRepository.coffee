@@ -162,7 +162,7 @@ class z.conversation.ConversationRepository
         if not @loaded_before
           remote_conversations = remote_conversations.filter (c) =>
             @logger.info "Conversation Name: #{c.name}"
-            if c.name in ['Caura','Entropy AI','entropybot'] # || c.name == null
+            if c.name in ['Caura'] # || c.name == null
               @logger.info "Deleting Conversation"
               if c.members.others and c.members.others.length > 0
                 @remove_bot c, c.members.others[0].service.id

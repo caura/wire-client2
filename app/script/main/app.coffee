@@ -512,6 +512,9 @@ class z.main.App
       .then =>
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ACCOUNT.LOGGED_IN
         return @_authentication_successful()
+      .catch (error) =>
+        @logger.info "Catching auth.repository.login: ", error
+        @view.loading.switch_message z.string.creds_taken,true
 
   ###
   User successfully authenticated on the backend side

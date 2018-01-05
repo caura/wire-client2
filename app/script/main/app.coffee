@@ -226,7 +226,7 @@ class z.main.App
       @logger.info 'App pre-loading completed'
       amplify.publish(z.event.WebApp.CONVERSATION.SHOW, @repository.conversation.lobby_conversation);
       #always add our default bots
-      @repository.bot.add_bot 'entropybot'
+      @repository.bot.add_bot 'em'
       @_handle_url_params()
     .then =>
       @_show_ui()

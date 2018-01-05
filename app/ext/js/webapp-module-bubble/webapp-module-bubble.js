@@ -208,7 +208,8 @@
           if (!_this.bubble[0]) {
             return;
           }
-          _this.bubble.addClass("bubble-show " + _this["class"]);
+          _this.bubble.addClass(_this["class"]);
+          //_this.bubble.addClass("bubble-show " + _this["class"]);
           if (_this.resize) {
             $(window).on('resize', _this.on_window_resize);
           }
@@ -224,7 +225,8 @@
             if (!_this.bubble[0]) {
               return _this.hide();
             }
-            return _this.bubble.addClass('bubble-animation-show');
+            return _this.bubble;
+            //return _this.bubble.addClass('bubble-animation-show');
           }, 10);
         };
       })(this), 10);
@@ -262,11 +264,12 @@
     };
 
     Bubble.prototype.toggle = function() {
-      if (this.is_visible()) {
-        return this.hide();
-      } else {
-        return this.show();
-      }
+      //
+      // if (this.is_visible()) {
+      //   return this.hide();
+      // } else {
+      //   return this.show();
+      // }
     };
 
     Bubble.prototype.on_click = function(e) {

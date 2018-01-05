@@ -162,11 +162,14 @@ class z.conversation.ConversationRepository
         if not @loaded_before
           remote_conversations = remote_conversations.filter (c) =>
             @logger.info "Conversation Name: #{c.name}"
-            if c.name in ['Caura'] # || c.name == null
+            if c.name not in ['Caura Lobby',null] # || c.name == null
               @logger.info "Deleting Conversation"
-              if c.members.others and c.members.others.length > 0
-                @remove_bot c, c.members.others[0].service.id
-              @clear_conversation c, true
+              try
+                if c.members.others and c.members.others.length > 0
+                  @remove_bot c, c.members.others[0].service.id
+                @clear_conversation c, true
+              catch error
+                @logger.error "Failed filtering out the conversation '" + c.name + "' from backend: " + error.message, error
               return false # filter out this conversation
             else if c.name in ['Caura Lobby']
               @lobby_conversation = c

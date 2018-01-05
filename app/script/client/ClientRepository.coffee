@@ -304,7 +304,7 @@ class z.client.ClientRepository
       else
         identifier = z.string.wire_linux
       device_model = z.localization.Localizer.get_text identifier
-      device_model = "#{device_model} (Internal)" if not z.util.Environment.frontend.is_production()
+      # device_model = "#{device_model} (Internal)" if not z.util.Environment.frontend.is_production()
     else
       device_model = "#{device_model} (Temporary)" if client_type is z.client.ClientType.TEMPORARY
 

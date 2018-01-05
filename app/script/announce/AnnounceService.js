@@ -29,9 +29,9 @@
     constructor() {
       this.logger = new z.util.Logger('z.announce.AnnounceService', z.config.LOGGER.OPTIONS);
       this.url = `${z.util.Environment.backend.website_url()}${ANNOUNCE_SERVICE_URL}?order=created&active=true`;
-      if (z.util.Environment.frontend.is_production()) {
-        this.url += '&production=true';
-      }
+      // if (z.util.Environment.frontend.is_production()) {
+      //   this.url += '&production=true';
+      // }
     }
 
     get_announcements() {

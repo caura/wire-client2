@@ -332,8 +332,7 @@ class z.main.App
     session_expired = false
     return new Promise (resolve) =>
       # caura: most of loading will be without /auth/ redirect
-      # z.util.Environment.frontend.is_localhost() or
-      if not is_reload and (document.referrer.toLowerCase().includes '/auth')
+      if not is_reload and (z.util.Environment.frontend.is_localhost() or document.referrer.toLowerCase().includes '/auth')
         token_promise = @auth.repository.get_cached_access_token().then(resolve)
       else
         token_promise = @auth.repository.get_access_token().then(resolve)
@@ -436,52 +435,52 @@ class z.main.App
   @param session_expired [Boolean] Whether to redirect the user to the login page
   ###
   logout: (cause, clear_data = false, session_expired = false) =>
-    _logout = =>
-      # Disconnect from our backend, end tracking and clear cached data
-      @repository.event.disconnect_web_socket z.event.WebSocketService::CHANGE_TRIGGER.LOGOUT
-      amplify.publish z.event.WebApp.ANALYTICS.CLOSE_SESSION
+    # _logout = =>
+    #   # Disconnect from our backend, end tracking and clear cached data
+    #   @repository.event.disconnect_web_socket z.event.WebSocketService::CHANGE_TRIGGER.LOGOUT
+    #   amplify.publish z.event.WebApp.ANALYTICS.CLOSE_SESSION
 
-      # Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
-      do_not_delete = [z.storage.StorageKey.AUTH.SHOW_LOGIN]
+    #   # Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
+    #   do_not_delete = [z.storage.StorageKey.AUTH.SHOW_LOGIN]
 
-      if @repository.client.is_current_client_permanent() and not clear_data
-        do_not_delete.push z.storage.StorageKey.AUTH.PERSIST
+    #   if @repository.client.is_current_client_permanent() and not clear_data
+    #     do_not_delete.push z.storage.StorageKey.AUTH.PERSIST
 
-      # XXX remove on next iteration
-      self_user = @repository.user.self()
-      if self_user
-        cookie_label_key = @repository.client.construct_cookie_label_key self_user.email() or self_user.phone()
+    #   # XXX remove on next iteration
+    #   self_user = @repository.user.self()
+    #   if self_user
+    #     cookie_label_key = @repository.client.construct_cookie_label_key self_user.email() or self_user.phone()
 
-        amplify_objects = amplify.store()
-        for amplify_key, amplify_value of amplify_objects
-          continue if amplify_key is cookie_label_key and clear_data
-          do_not_delete.push amplify_key if z.util.StringUtil.includes amplify_key, z.storage.StorageKey.AUTH.COOKIE_LABEL
+    #     amplify_objects = amplify.store()
+    #     for amplify_key, amplify_value of amplify_objects
+    #       continue if amplify_key is cookie_label_key and clear_data
+    #       do_not_delete.push amplify_key if z.util.StringUtil.includes amplify_key, z.storage.StorageKey.AUTH.COOKIE_LABEL
 
-        @repository.cache.clear_cache session_expired, do_not_delete
+    #     @repository.cache.clear_cache session_expired, do_not_delete
 
-      # Clear IndexedDB
-      if clear_data
-        @repository.storage.delete_everything()
-        .catch (error) =>
-          @logger.error 'Failed to delete database before logout', error
-        .then =>
-          @_redirect_to_login session_expired
-      else
-        @_redirect_to_login session_expired
+    #   # Clear IndexedDB
+    #   if clear_data
+    #     @repository.storage.delete_everything()
+    #     .catch (error) =>
+    #       @logger.error 'Failed to delete database before logout', error
+    #     .then =>
+    #       @_redirect_to_login session_expired
+    #   else
+    #     @_redirect_to_login session_expired
 
-    _logout_on_backend = =>
-      @logger.info "Logout triggered by '#{cause}': Disconnecting user from the backend."
-      @auth.repository.logout()
-      .then -> _logout()
-      .catch => @_redirect_to_login false
+    # _logout_on_backend = =>
+    #   @logger.info "Logout triggered by '#{cause}': Disconnecting user from the backend."
+    #   @auth.repository.logout()
+    #   .then -> _logout()
+    #   .catch => @_redirect_to_login false
 
-    if session_expired
-      _logout()
-    else if navigator.onLine
-      _logout_on_backend()
-    else
-      @logger.warn 'No internet access. Continuing when internet connectivity regained.'
-      $(window).on 'online', -> _logout_on_backend()
+    # if session_expired
+    #   _logout()
+    # else if navigator.onLine
+    #   _logout_on_backend()
+    # else
+    #   @logger.warn 'No internet access. Continuing when internet connectivity regained.'
+    #   $(window).on 'online', -> _logout_on_backend()
 
   refresh: =>
     if z.util.Environment.electron

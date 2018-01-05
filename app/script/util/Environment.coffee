@@ -143,7 +143,8 @@ z.util.Environment = do ->
   electron: _check.is_electron()
 
   version: (show_wrapper_version = true, do_not_format = false) ->
-    return 'dev' if z.util.Environment.frontend.is_localhost()
-    return app_version() if do_not_format
-    return window.electron_version if window.electron_version and show_wrapper_version
-    return formatted_app_version()
+    return 'dev' # if z.util.Environment.frontend.is_localhost()
+    # #caura: hide these options until it is clear the different in pre-flight origin
+    # return app_version() if do_not_format
+    # return window.electron_version if window.electron_version and show_wrapper_version
+    # return formatted_app_version()

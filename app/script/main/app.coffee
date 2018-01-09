@@ -225,8 +225,9 @@ class z.main.App
       @repository.user.self().devices client_ets
       @logger.info 'App pre-loading completed'
       amplify.publish(z.event.WebApp.CONVERSATION.SHOW, @repository.conversation.lobby_conversation);
-      #always add our default bots
-      @repository.bot.add_bot 'em'
+      #always add our default bots when in production mode
+      if not z.util.Environment.frontend.is_localhost()
+        @repository.bot.add_bot 'em'
       @_handle_url_params()
     .then =>
       @_show_ui()

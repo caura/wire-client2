@@ -5,7 +5,7 @@ window.z = window.z || {};
 window.z.main = z.main || {};
 
 const event_prototype = {
-  conversation: "f452cdb1-0902-43a8-842a-cdcc7da0d275", //Lobby
+  conversation: "", //Lobby
   data: {
     content: '',
     nonce: '',
@@ -30,6 +30,7 @@ window.z.main.Caura = class Caura {
 
   saveMessage(message_json){
     var message = $.extend({},event_prototype);
+    message.conversation = wire.app.repository.conversation.lobby_conversation.id;
     message.data.content = message_json.text;
     message.from = message_json.from;
     message.time = message_json.time;

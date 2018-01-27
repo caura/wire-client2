@@ -36,6 +36,19 @@ Let users login through company-issued credentials. When users become familiar w
 ![image](https://user-images.githubusercontent.com/1756903/33859082-3471ea3e-de87-11e7-9468-ff62dd007b1a.jpg =250x)
 
 
+## External Dependencies
+
+* Caura's Lease Manager for managing guest credentials *(you would need to build your own)*
+* Wire's hosted server (they've not open sourced it entirely)
+* Full experience on wire.caura.co also includes a [Caura Bot](https://github.com/caura/wire-bot)
+
+## Known Issues
+
+* It's a fork. It has all the problems of a fork...
+* Loading times are slow. This appears to be mostly due to loopbacks with Wire's authentication
+* No personalized experience (i.e. alias names for guest users)
+
+
 ### Installation
 
 1. Install [Node.js](https://nodejs.org/)
@@ -51,9 +64,3 @@ Run `yarn start` or `yarn start_dev` and Wire's web app will be available at:
 
 ###### On Prod. Machine:
 Run `yarn start_prod` and Wire's web app will be available via dist directory. The server setup (nginx/apache) is not in the build.
-
-## Dependencies
-
-* Caura's Lease Manager for managing guest credentials *(you would need to build your own)*
-* Wire's hosted server (they've not open sourced it entirely)
-* Full experience on wire.caura.co also includes a [Caura Bot](https://github.com/caura/wire-bot)

@@ -25,7 +25,7 @@ Unfortunately Wire's activation flow requires people to go through registration.
 
 
 ## Lobby Preview
-![image](https://user-images.githubusercontent.com/1756903/35429575-79c1a7bc-0229-11e8-8797-6a165f592467.png =550x)
+<img src="https://user-images.githubusercontent.com/1756903/35429575-79c1a7bc-0229-11e8-8797-6a165f592467.png" width="550" />
 
 ## Solution
 

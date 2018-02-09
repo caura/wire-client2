@@ -32,8 +32,8 @@ Unfortunately Wire's activation flow requires people to go through registration.
 ##### Rely on Guest Users and a backend server to issue those logins.
 Let users login through company-issued credentials. When users become familiar with the interface--only then suggest them to create a new user.
 
-![image](https://user-images.githubusercontent.com/1756903/33859081-345b1c5a-de87-11e7-829f-721d563d2cd6.jpg =250x)
-![image](https://user-images.githubusercontent.com/1756903/33859082-3471ea3e-de87-11e7-9468-ff62dd007b1a.jpg =250x)
+<img src="https://user-images.githubusercontent.com/1756903/33859081-345b1c5a-de87-11e7-829f-721d563d2cd6.jpg" width="250" />
+<img src="https://user-images.githubusercontent.com/1756903/33859082-3471ea3e-de87-11e7-9468-ff62dd007b1a.jpg" width="250" />
 
 
 ## External Dependencies
